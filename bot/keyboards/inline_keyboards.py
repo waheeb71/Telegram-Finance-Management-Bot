@@ -119,6 +119,24 @@ def get_admin_menu_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
+def get_operations_menu_keyboard(role: UserRole) -> InlineKeyboardMarkup:
+    buttons = [
+        [
+            InlineKeyboardButton(text="💰 آخر الإيرادات", callback_data="list_incomes"),
+            InlineKeyboardButton(text="💸 آخر المصروفات", callback_data="list_expenses")
+        ]
+    ]
+
+    if role in [UserRole.SUPER_ADMIN, UserRole.FINANCE_ADMIN]:
+        buttons.append([
+            InlineKeyboardButton(text="✏️ تعديل آخر عملية", callback_data="edit_last_op"),
+            InlineKeyboardButton(text="📑 سجل العمليات Audit Log", callback_data="view_audit_logs")
+        ])
+
+    buttons.append([InlineKeyboardButton(text="🔙 القائمة الرئيسية", callback_data="main_menu")])
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
 def get_back_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔙 رجوع", callback_data="main_menu")]

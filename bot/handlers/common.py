@@ -1,3 +1,4 @@
+from bot.keyboards.inline_keyboards import get_operations_menu_keyboard
 from aiogram import Router, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery
@@ -24,6 +25,7 @@ async def cmd_start(message: Message, db_user: User, user_role: UserRole):
         f"النظام المالي الموحد لإدارة إيرادات ومصروفات دفعة تخرج <b>«يمن سايبر»</b>.\n\n"
         f"👤 <b>اسمك:</b> {db_user.full_name}\n"
         f"🔰 <b>صلاحيتك:</b> {db_user.role.value}\n\n"
+         f"ملاحظة: البوت قد يتاخر بالرد بسبب السرفر"
         f"الرجاء اختيار القسم المطلوب من القائمة أدناه:"
     )
     await message.answer(
@@ -79,6 +81,16 @@ async def cb_sponsors_menu(callback: CallbackQuery, user_role: UserRole):
     await callback.message.edit_text(
         text="🏢 <b>إدارة الرعاة والداعمين</b>\n\nاختر الإجراء المطلوب:",
         reply_markup=get_sponsor_menu_keyboard(user_role),
+        parse_mode="HTML"
+    )
+    await callback.answer()
+
+
+@common_router.callback_query(F.data == "menu_operations")
+async def cb_operations_menu(callback: CallbackQuery, user_role: UserRole):
+    await callback.message.edit_text(
+        text="📂 <b>سجل وقائمة العمليات</b>\n\nاختر الخيار المطلوب:",
+        reply_markup=get_operations_menu_keyboard(user_role),
         parse_mode="HTML"
     )
     await callback.answer()

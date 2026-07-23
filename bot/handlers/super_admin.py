@@ -173,3 +173,38 @@ async def cb_backup_database(callback: CallbackQuery, user_role: UserRole, db_se
         reply_markup=get_back_keyboard()
     )
     await callback.answer()
+
+
+@super_admin_router.callback_query(F.data == "edit_last_op")
+async def cb_edit_last_op(callback: CallbackQuery, db_user: User, db_session: AsyncSession):
+    last_op = await FinanceService.get_last_operation(db_session, db_user.id)
+    if not last_op:
+        await callback.message.edit_text(
+            "📭 لم يتم العثور على أية عمليات سابقة تم تسجيلها من قبلك.",
+            reply_markup=get_back_keyboard()
+        )
+        await callback.answer()
+        return
+
+    op_type = last_op["type"]
+    obj = last_op["obj"]
+    
+    if op_type == "INCOME":
+        text = (
+            f"✏️ **آخر عملية إيراد سجلتها:**\n\n"
+            f"🔢 **الرقم:** `{obj.op_number}`\n"
+            f"💰 **المبلغ:** {obj.amount:,.0f} ريال\n"
+            f"👤 **المستلم:** {obj.recipient_name}\n"
+            f"📝 **ملاحظات:** {obj.notes or 'لا يوجد'}\n"
+        )
+    else:
+        text = (
+            f"✏️ **آخر عملية مصروف سجلتها:**\n\n"
+            f"🔢 **الرقم:** `{obj.op_number}`\n"
+            f"💸 **المبلغ:** {obj.amount:,.0f} ريال\n"
+            f"👤 **المستفيد:** {obj.beneficiary_name}\n"
+            f"📝 **سبب الصرف:** {obj.reason}\n"
+        )
+
+    await callback.message.edit_text(text, reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await callback.answer()
