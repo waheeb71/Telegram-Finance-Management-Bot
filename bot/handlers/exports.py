@@ -23,7 +23,7 @@ async def cb_export_menu(callback: CallbackQuery, user_role: UserRole):
         ],
         [InlineKeyboardButton(text="🔙 القائمة الرئيسية", callback_data="main_menu")]
     ])
-    await callback.message.edit_text("📁 **قسم التصديرات**\n\nاختر نوع الملف المراد تصديره:", reply_markup=kb, parse_mode="Markdown")
+    await callback.message.edit_text("📁 <b>قسم التصديرات</b>\n\nاختر نوع الملف المراد تصديره:", reply_markup=kb, parse_mode="HTML")
     await callback.answer()
 
 
@@ -36,7 +36,8 @@ async def cb_export_excel(callback: CallbackQuery, db_session: AsyncSession):
     input_file = BufferedInputFile(excel_io.getvalue(), filename=filename)
     await callback.message.answer_document(
         document=input_file,
-        caption="📊 **تفضل الشيت المالي الكامل بصيغة Excel.**",
+        caption="📊 <b>تفضل الشيت المالي الكامل بصيغة Excel.</b>",
+        parse_mode="HTML",
         reply_markup=get_back_keyboard()
     )
     await callback.answer()
@@ -51,7 +52,8 @@ async def cb_export_pdf(callback: CallbackQuery, db_session: AsyncSession):
     input_file = BufferedInputFile(pdf_io.getvalue(), filename=filename)
     await callback.message.answer_document(
         document=input_file,
-        caption="📄 **تفضل التقرير المالي الموحد بصيغة PDF.**",
+        caption="📄 <b>تفضل التقرير المالي الموحد بصيغة PDF.</b>",
+        parse_mode="HTML",
         reply_markup=get_back_keyboard()
     )
     await callback.answer()

@@ -29,7 +29,7 @@ async def start_add_sponsor(callback: CallbackQuery, user_role: UserRole, state:
         return
 
     await state.set_state(AddSponsorFSM.company_name)
-    await callback.message.edit_text("🏢 **إضافة راعٍ جديد**\n\nأدخل **اسم الشركة / الجهة الراعية**:", reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text("🏢 <b>إضافة راعٍ جديد</b>\n\nأدخل <b>اسم الشركة / الجهة الراعية</b>:", reply_markup=get_back_keyboard(), parse_mode="HTML")
     await callback.answer()
 
 
@@ -37,7 +37,7 @@ async def start_add_sponsor(callback: CallbackQuery, user_role: UserRole, state:
 async def process_sponsor_company(message: Message, state: FSMContext):
     await state.update_data(company_name=message.text.strip())
     await state.set_state(AddSponsorFSM.contact_person)
-    await message.answer("👤 أدخل **اسم شخص التواصل / المسؤول** (أو 'لا يوجد'):", reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await message.answer("👤 أدخل <b>اسم شخص التواصل / المسؤول</b> (أو 'لا يوجد'):", reply_markup=get_back_keyboard(), parse_mode="HTML")
 
 
 @sponsors_router.message(AddSponsorFSM.contact_person)
@@ -47,7 +47,7 @@ async def process_sponsor_contact(message: Message, state: FSMContext):
         person = None
     await state.update_data(contact_person=person)
     await state.set_state(AddSponsorFSM.phone)
-    await message.answer("📱 أدخل **رقم هاتف الراعي / المسؤول** (أو 'لا يوجد'):", reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await message.answer("📱 أدخل <b>رقم هاتف الراعي / المسؤول</b> (أو 'لا يوجد'):", reply_markup=get_back_keyboard(), parse_mode="HTML")
 
 
 @sponsors_router.message(AddSponsorFSM.phone)
@@ -57,7 +57,7 @@ async def process_sponsor_phone(message: Message, state: FSMContext):
         phone = None
     await state.update_data(phone=phone)
     await state.set_state(AddSponsorFSM.amount)
-    await message.answer("💵 أدخل **مبلغ الدعم / الرعاية النقدية** (إذا كانت الرعاية غير نقدية أدخل 0):", reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await message.answer("💵 أدخل <b>مبلغ الدعم / الرعاية النقدية</b> (إذا كانت الرعاية غير نقدية أدخل 0):", reply_markup=get_back_keyboard(), parse_mode="HTML")
 
 
 @sponsors_router.message(AddSponsorFSM.amount)
@@ -83,7 +83,7 @@ async def process_sponsor_amount(message: Message, state: FSMContext):
         [InlineKeyboardButton(text="أخرى", callback_data="spo_type_OTHER")],
         [InlineKeyboardButton(text="❌ إلغاء", callback_data="main_menu")]
     ])
-    await message.answer("🏷️ **اختر نوع الرعاية:**", reply_markup=kb, parse_mode="Markdown")
+    await message.answer("🏷️ <b>اختر نوع الرعاية:</b>", reply_markup=kb, parse_mode="HTML")
 
 
 @sponsors_router.callback_query(AddSponsorFSM.sponsorship_type, F.data.startswith("spo_type_"))
@@ -91,7 +91,7 @@ async def process_sponsor_type(callback: CallbackQuery, state: FSMContext):
     stype_str = callback.data.replace("spo_type_", "")
     await state.update_data(sponsorship_type=SponsorshipType[stype_str])
     await state.set_state(AddSponsorFSM.notes)
-    await callback.message.edit_text("📝 أدخل أي **ملاحظات إضافية** (أو أرسل كلمة 'لا يوجد'):", reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text("📝 أدخل أي <b>ملاحظات إضافية</b> (أو أرسل كلمة 'لا يوجد'):", reply_markup=get_back_keyboard(), parse_mode="HTML")
     await callback.answer()
 
 
@@ -118,7 +118,6 @@ async def process_sponsor_notes(message: Message, state: FSMContext, bot: Bot, d
 
     fin_summary = await FinanceService.get_financial_summary(db_session)
 
-    # Send notification if financial sponsor
     if sponsor.amount > 0:
         notif_text = NotificationService.format_sponsor_notification(
             company_name=sponsor.company_name,
@@ -130,13 +129,13 @@ async def process_sponsor_notes(message: Message, state: FSMContext, bot: Bot, d
         await db_session.commit()
 
     success_msg = (
-        f"✅ **تمت إضافة الراعي بنجاح!**\n\n"
-        f"🏢 **الشركة / الجهة:** {sponsor.company_name}\n"
-        f"🏷️ **نوع الرعاية:** {sponsor.sponsorship_type.value}\n"
-        f"💰 **المبلغ:** {format_currency(sponsor.amount)}\n"
-        f"💵 **الرصيد الحالي للدفعة:** {format_currency(fin_summary['current_balance'])}\n"
+        f"✅ <b>تمت إضافة الراعي بنجاح!</b>\n\n"
+        f"🏢 <b>الشركة / الجهة:</b> {sponsor.company_name}\n"
+        f"🏷️ <b>نوع الرعاية:</b> {sponsor.sponsorship_type.value}\n"
+        f"💰 <b>المبلغ:</b> {format_currency(sponsor.amount)}\n"
+        f"💵 <b>الرصيد الحالي للدفعة:</b> {format_currency(fin_summary['current_balance'])}\n"
     )
-    await message.answer(success_msg, reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await message.answer(success_msg, reply_markup=get_back_keyboard(), parse_mode="HTML")
 
 
 @sponsors_router.callback_query(F.data == "list_sponsors")
@@ -147,14 +146,14 @@ async def cb_list_sponsors(callback: CallbackQuery, db_session: AsyncSession):
         await callback.answer()
         return
 
-    text = "🏢 **قائمة الرعاة والداعمين للدفعة:**\n\n"
+    text = "🏢 <b>قائمة الرعاة والداعمين للدفعة:</b>\n\n"
     for sp in sponsors:
         text += (
-            f"🔹 **{sp.company_name}** | النوع: {sp.sponsorship_type.value}\n"
-            f"المبلغ: **{format_currency(sp.amount)}** | المسؤول: {sp.contact_person or 'غير محدد'}\n"
+            f"🔹 <b>{sp.company_name}</b> | النوع: {sp.sponsorship_type.value}\n"
+            f"المبلغ: <b>{format_currency(sp.amount)}</b> | المسؤول: {sp.contact_person or 'غير محدد'}\n"
             f"ملاحظات: {sp.notes or 'لا يوجد'}\n"
             f"ــــــــــــــــــــــــــــــــــــــــ\n"
         )
 
-    await callback.message.edit_text(text, reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text(text, reply_markup=get_back_keyboard(), parse_mode="HTML")
     await callback.answer()

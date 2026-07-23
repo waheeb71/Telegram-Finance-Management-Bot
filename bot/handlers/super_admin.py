@@ -29,7 +29,7 @@ async def start_add_finance_admin(callback: CallbackQuery, user_role: UserRole, 
 
     await state.update_data(target_role=UserRole.FINANCE_ADMIN)
     await state.set_state(RoleManagementFSM.target_user_id)
-    await callback.message.edit_text("👤 **إضافة مسؤول مالي**\n\nأدخل **Telegram User ID** الخاص بالعضو المراد تعيينه كمسؤول مالي:", reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text("👤 <b>إضافة مسؤول مالي</b>\n\nأدخل <b>Telegram User ID</b> الخاص بالعضو المراد تعيينه كمسؤول مالي:", reply_markup=get_back_keyboard(), parse_mode="HTML")
     await callback.answer()
 
 
@@ -41,7 +41,7 @@ async def start_add_relations_admin(callback: CallbackQuery, user_role: UserRole
 
     await state.update_data(target_role=UserRole.RELATIONS_ADMIN)
     await state.set_state(RoleManagementFSM.target_user_id)
-    await callback.message.edit_text("🤝 **إضافة مسؤول علاقات**\n\nأدخل **Telegram User ID** الخاص بالعضو المراد تعيينه كمسؤول علاقات:", reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text("🤝 <b>إضافة مسؤول علاقات</b>\n\nأدخل <b>Telegram User ID</b> الخاص بالعضو المراد تعيينه كمسؤول علاقات:", reply_markup=get_back_keyboard(), parse_mode="HTML")
     await callback.answer()
 
 
@@ -60,7 +60,6 @@ async def process_role_user_id(message: Message, state: FSMContext, db_user: Use
     user = res.scalar_one_or_none()
 
     if not user:
-        # Register new user shell
         user = User(
             telegram_id=target_tg_id,
             full_name=f"مستخدم {target_tg_id}",
@@ -86,9 +85,9 @@ async def process_role_user_id(message: Message, state: FSMContext, db_user: Use
     await state.clear()
 
     await message.answer(
-        f"✅ **تم تحديث الصلاحية بنجاح!**\n\n👤 المستخدم `{target_tg_id}` أصبح الآن: **{target_role.value}**",
+        f"✅ <b>تم تحديث الصلاحية بنجاح!</b>\n\n👤 المستخدم <code>{target_tg_id}</code> أصبح الآن: <b>{target_role.value}</b>",
         reply_markup=get_back_keyboard(),
-        parse_mode="Markdown"
+        parse_mode="HTML"
     )
 
 
@@ -110,16 +109,17 @@ async def cb_view_audit_logs(callback: CallbackQuery, user_role: UserRole, db_se
         await callback.answer()
         return
 
-    text = "📑 **سجل العمليات الإدارية (Audit Logs):**\n\n"
+    text = "📑 <b>سجل العمليات الإدارية (Audit Logs):</b>\n\n"
     for lg in logs:
+        details_str = json.dumps(lg.new_values or {}, ensure_ascii=False)
         text += (
-            f"🔹 `[{lg.action}]` {lg.entity_type} (ID: {lg.entity_id or '-'})\n"
+            f"🔹 <code>[{lg.action}]</code> {lg.entity_type} (ID: {lg.entity_id or '-'})\n"
             f"بواسطة المستخدم ID: {lg.performed_by_user_id} | الوقت: {lg.timestamp.strftime('%Y-%m-%d %H:%M')}\n"
-            f"التفاصيل: {json.dumps(lg.new_values or {}, ensure_ascii=False)}\n"
+            f"التفاصيل: {details_str}\n"
             f"ــــــــــــــــــــــــــــــــــــــــ\n"
         )
 
-    await callback.message.edit_text(text, reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text(text, reply_markup=get_back_keyboard(), parse_mode="HTML")
     await callback.answer()
 
 
@@ -169,7 +169,8 @@ async def cb_backup_database(callback: CallbackQuery, user_role: UserRole, db_se
     input_file = BufferedInputFile(json_bytes, filename=filename)
     await callback.message.answer_document(
         document=input_file,
-        caption="💾 **نسخة احتياطية كاملة من قاعدة بيانات البوت.**",
+        caption="💾 <b>نسخة احتياطية كاملة من قاعدة بيانات البوت.</b>",
+        parse_mode="HTML",
         reply_markup=get_back_keyboard()
     )
     await callback.answer()
@@ -191,20 +192,20 @@ async def cb_edit_last_op(callback: CallbackQuery, db_user: User, db_session: As
     
     if op_type == "INCOME":
         text = (
-            f"✏️ **آخر عملية إيراد سجلتها:**\n\n"
-            f"🔢 **الرقم:** `{obj.op_number}`\n"
-            f"💰 **المبلغ:** {obj.amount:,.0f} ريال\n"
-            f"👤 **المستلم:** {obj.recipient_name}\n"
-            f"📝 **ملاحظات:** {obj.notes or 'لا يوجد'}\n"
+            f"✏️ <b>آخر عملية إيراد سجلتها:</b>\n\n"
+            f"🔢 <b>الرقم:</b> <code>{obj.op_number}</code>\n"
+            f"💰 <b>المبلغ:</b> {obj.amount:,.0f} ريال\n"
+            f"👤 <b>المستلم:</b> {obj.recipient_name}\n"
+            f"📝 <b>ملاحظات:</b> {obj.notes or 'لا يوجد'}\n"
         )
     else:
         text = (
-            f"✏️ **آخر عملية مصروف سجلتها:**\n\n"
-            f"🔢 **الرقم:** `{obj.op_number}`\n"
-            f"💸 **المبلغ:** {obj.amount:,.0f} ريال\n"
-            f"👤 **المستفيد:** {obj.beneficiary_name}\n"
-            f"📝 **سبب الصرف:** {obj.reason}\n"
+            f"✏️ <b>آخر عملية مصروف سجلتها:</b>\n\n"
+            f"🔢 <b>الرقم:</b> <code>{obj.op_number}</code>\n"
+            f"💸 <b>المبلغ:</b> {obj.amount:,.0f} ريال\n"
+            f"👤 <b>المستفيد:</b> {obj.beneficiary_name}\n"
+            f"📝 <b>سبب الصرف:</b> {obj.reason}\n"
         )
 
-    await callback.message.edit_text(text, reply_markup=get_back_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text(text, reply_markup=get_back_keyboard(), parse_mode="HTML")
     await callback.answer()
