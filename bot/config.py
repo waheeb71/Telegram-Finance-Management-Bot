@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     
     DATABASE_URL: str = "postgresql+asyncpg://neondb_owner:npg_mKwgkb6FWD9B@ep-noisy-glitter-aynq0lr1-pooler.c-5.us-east-2.aws.neon.tech/neondb?ssl=require"
     REDIS_URL: Optional[str] = None
+    WEBHOOK_URL: Optional[str] = None
     
     BOT_LANGUAGE: str = "ar"
     CURRENCY_SYMBOL: str = "ريال"
