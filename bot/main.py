@@ -51,10 +51,10 @@ async def main():
     dp.include_router(exports_router)
     dp.include_router(super_admin_router)
 
-    logger.info("Yemen Cyber Finance Bot started polling successfully.")
-
-    # 5. Start Long Polling
+    # 5. Clear old webhook & start Long Polling
     try:
+        await bot.delete_webhook(drop_pending_updates=True)
+        logger.info("Deleted old webhook successfully.")
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     finally:
         await bot.session.close()
