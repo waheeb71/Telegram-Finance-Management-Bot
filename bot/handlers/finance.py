@@ -54,6 +54,18 @@ async def start_add_income(callback: CallbackQuery, user_role: UserRole, state: 
 @finance_router.callback_query(AddIncomeFSM.category, F.data.startswith("inc_cat_"))
 async def process_income_category(callback: CallbackQuery, state: FSMContext):
     cat_str = callback.data.replace("inc_cat_", "")
+    
+    if cat_str == "STUDENT_FEE":
+        from bot.handlers.students import RecordStudentFeeFSM
+        await state.set_state(RecordStudentFeeFSM.student_search)
+        await callback.message.edit_text(
+            "🔍 <b>تسجيل رسوم طالب</b>\n\nاكتب <b>اسم الطالب</b> أو <b>رقمه الأكاديمي</b> للبحث عنه لخصم المبلغ من حسابه الفردي وتحديث المتبقي عليه:",
+            reply_markup=get_back_keyboard(),
+            parse_mode="HTML"
+        )
+        await callback.answer()
+        return
+
     await state.update_data(category=IncomeCategory[cat_str])
     await state.set_state(AddIncomeFSM.amount)
     await callback.message.edit_text("💵 أدخل <b>مبلغ الإيراد</b> بالريال (مثال: 50000):", reply_markup=get_back_keyboard(), parse_mode="HTML")
