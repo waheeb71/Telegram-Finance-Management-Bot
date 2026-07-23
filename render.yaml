@@ -1,0 +1,17 @@
+services:
+  - type: worker
+    name: yemen-cyber-finance-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m bot.main
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: SUPER_ADMIN_ID
+        sync: false
+      - key: NOTIFICATION_GROUP_ID
+        sync: false
+      - key: STORAGE_CHANNEL_ID
+        sync: false
+      - key: DATABASE_URL
+        value: postgresql+asyncpg://neondb_owner:npg_mKwgkb6FWD9B@ep-noisy-glitter-aynq0lr1-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require
