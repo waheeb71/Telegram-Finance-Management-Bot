@@ -37,6 +37,7 @@ async def cmd_start(message: Message, db_user: User, user_role: UserRole):
         f"النظام المالي الموحد لإدارة إيرادات ومصروفات دفعة تخرج <b>«يمن سايبر»</b>.\n\n"
         f"👤 <b>اسمك:</b> {db_user.full_name}\n"
         f"🔰 <b>صلاحيتك:</b> {db_user.role.value}\n\n"
+        f"⚠️ <i>ملاحظة: قد يتأخر البوت في الرد أحياناً بسبب استيقاظ السيرفر.</i>\n\n"
         f"الرجاء اختيار القسم المطلوب من القائمة أدناه:"
     )
     await message.answer(
