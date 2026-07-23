@@ -17,6 +17,43 @@ from bot.services.student_service import StudentService
 from bot.services.sponsor_service import SponsorService
 
 
+import os
+import urllib.request
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+FONT_PATH = os.path.join(os.path.dirname(__file__), "..", "assets", "fonts", "Amiri-Regular.ttf")
+
+
+def register_arabic_font() -> str:
+    """Registers an Arabic-compatible TrueType font for ReportLab."""
+    font_name = "Amiri"
+    font_dir = os.path.dirname(FONT_PATH)
+    
+    if not os.path.exists(font_dir):
+        os.makedirs(font_dir, exist_ok=True)
+
+    if not os.path.exists(FONT_PATH):
+        # Fallback to Windows system font if available
+        win_arial = "C:\\Windows\\Fonts\\arial.ttf"
+        if os.path.exists(win_arial):
+            pdfmetrics.registerFont(TTFont(font_name, win_arial))
+            return font_name
+        
+        # Download Amiri-Regular font if missing
+        try:
+            url = "https://raw.githubusercontent.com/google/fonts/main/ofl/amiri/Amiri-Regular.ttf"
+            urllib.request.urlretrieve(url, FONT_PATH)
+        except Exception:
+            pass
+
+    if os.path.exists(FONT_PATH):
+        pdfmetrics.registerFont(TTFont(font_name, FONT_PATH))
+        return font_name
+
+    return "Helvetica"
+
+
 def reshape_ar(text: str) -> str:
     """Helper to reshape and reorder Arabic text for ReportLab PDF rendering."""
     if not text:
@@ -148,6 +185,8 @@ class ExportService:
 
     @staticmethod
     async def generate_pdf_report(session: AsyncSession) -> io.BytesIO:
+        font_name = register_arabic_font()
+
         output = io.BytesIO()
         doc = SimpleDocTemplate(output, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
         elements = []
@@ -157,7 +196,7 @@ class ExportService:
         title_style = ParagraphStyle(
             "ArabicTitle",
             parent=normal_style,
-            fontName="Helvetica-Bold",
+            fontName=font_name,
             fontSize=18,
             leading=22,
             alignment=1, # Center
@@ -167,7 +206,7 @@ class ExportService:
         subtitle_style = ParagraphStyle(
             "ArabicSubTitle",
             parent=normal_style,
-            fontName="Helvetica",
+            fontName=font_name,
             fontSize=12,
             leading=16,
             alignment=1,
@@ -177,9 +216,9 @@ class ExportService:
         cell_style = ParagraphStyle(
             "ArabicCell",
             parent=normal_style,
-            fontName="Helvetica",
-            fontSize=10,
-            leading=12,
+            fontName=font_name,
+            fontSize=11,
+            leading=14,
             alignment=2 # Right aligned
         )
 
@@ -209,7 +248,7 @@ class ExportService:
             ('BACKGROUND', (0,0), (1,0), colors.HexColor("#1F4E79")),
             ('TEXTCOLOR', (0,0), (1,0), colors.whitesmoke),
             ('ALIGN', (0,0), (-1,-1), 'RIGHT'),
-            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('FONTNAME', (0,0), (-1,0), font_name),
             ('BOTTOMPADDING', (0,0), (-1,0), 8),
             ('BACKGROUND', (0,1), (-1,-1), colors.HexColor("#F2F2F2")),
             ('GRID', (0,0), (-1,-1), 1, colors.HexColor("#D9D9D9")),
@@ -219,3 +258,4 @@ class ExportService:
         doc.build(elements)
         output.seek(0)
         return output
+
