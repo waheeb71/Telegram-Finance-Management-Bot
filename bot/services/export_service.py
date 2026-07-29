@@ -86,7 +86,7 @@ class ExportService:
 
         stats = await ReportService.get_dashboard_stats(session)
         
-        ws_sum.append(["تقرير المالي - دفعة يمن سايبر"])
+        ws_sum.append(["تقرير المالي - دفعة  ابداع مهندس"])
         ws_sum.merge_cells("A1:B1")
         ws_sum["A1"].font = title_font
 
@@ -225,7 +225,7 @@ class ExportService:
         stats = await ReportService.get_dashboard_stats(session)
 
         # Header Title
-        title_p = Paragraph(reshape_ar("التقرير المالي - دفعة تخرج يمن سايبر"), title_style)
+        title_p = Paragraph(reshape_ar("التقرير المالي - دفعة تخرج  ابداع مهندس"), title_style)
         date_p = Paragraph(reshape_ar(f"تاريخ التقرير: {datetime.now().strftime('%Y-%m-%d')}"), subtitle_style)
         elements.append(title_p)
         elements.append(date_p)

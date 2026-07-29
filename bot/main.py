@@ -26,7 +26,7 @@ from aiogram.types import BotCommand, BotCommandScopeDefault
 
 
 async def health_handler(request):
-    return web.Response(text="OK - Yemen Cyber Finance Bot is active")
+    return web.Response(text="OK -  ابداع مهندس is active")
 
 
 async def setup_bot_commands(bot: Bot):
@@ -52,7 +52,7 @@ async def on_startup(bot: Bot):
 
 
 async def main():
-    logger.info("Initializing Yemen Cyber Finance Bot...")
+    logger.info("Initializing  ابداع مهندس...")
 
     # 1. Initialize Database Tables inside the current main event loop
     try:

@@ -58,8 +58,8 @@ async def cmd_admin(message: Message, user_role: UserRole):
 @common_router.message(CommandStart())
 async def cmd_start(message: Message, db_user: User, user_role: UserRole):
     welcome_text = (
-        f"👋 <b>مرحباً بك في بوت Yemen Cyber Finance Bot</b>\n\n"
-        f"النظام المالي الموحد لإدارة إيرادات ومصروفات دفعة تخرج <b>«يمن سايبر»</b>.\n\n"
+        f"👋 <b>مرحباً بك في بوت  ابداع مهندس</b>\n\n"
+        f"النظام المالي الموحد لإدارة إيرادات ومصروفات دفعة تخرج <b>« ابداع مهندس»</b>.\n\n"
         f"👤 <b>اسمك:</b> {db_user.full_name}\n"
         f"🔰 <b>صلاحيتك:</b> {db_user.role.value}\n\n"
         f"⚠️ <i>ملاحظة: قد يتأخر البوت في الرد أحياناً بسبب استيقاظ السيرفر.</i>\n\n"
@@ -74,7 +74,7 @@ async def cmd_start(message: Message, db_user: User, user_role: UserRole):
 
 @common_router.callback_query(F.data == "main_menu")
 async def cb_main_menu(callback: CallbackQuery, db_user: User, user_role: UserRole):
-    text = f"🏠 <b>القائمة الرئيسية - Yemen Cyber Finance Bot</b>"
+    text = f"🏠 <b>القائمة الرئيسية -  ابداع مهندس</b>"
     await safe_edit_or_reply(callback, text=text, reply_markup=get_main_menu_keyboard(user_role))
     await callback.answer()
 
